@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
@@ -33,36 +32,12 @@ public class SingularStringExtractor(IMetadataProvider<SyntaxNode> metadataProvi
         {
 
             var argument = accessor.ArgumentList.Arguments.FirstOrDefault();
-            if (argument != null && TryGetString(argument.Expression, out var value))
+            if (argument != null && argument.Expression.TryGetString(out var value))
             {
                 result = CreateLocalizedString(value, null, node);
                 return true;
             }
         }
-
-        return false;
-    }
-
-    internal static bool TryGetString(ExpressionSyntax expression, out string value)
-    {
-        if (expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression))
-        {
-            value = literal.Token.ValueText;
-
-            return true;
-        }
-
-        if (expression is BinaryExpressionSyntax binary &&
-            binary.IsKind(SyntaxKind.AddExpression) &&
-            TryGetString(binary.Left, out var left) &&
-            TryGetString(binary.Right, out var right))
-        {
-            value = left + right;
-
-            return true;
-        }
-
-        value = null;
 
         return false;
     }

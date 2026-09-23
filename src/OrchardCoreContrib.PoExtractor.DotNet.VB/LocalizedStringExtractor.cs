@@ -13,6 +13,9 @@ namespace OrchardCoreContrib.PoExtractor.DotNet.VB;
 /// The localizable string is identified by the constructor call - New LocalizedString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE")
 /// or New LocalizedHtmlString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE"). The single argument form
 /// New LocalizedString("TEXT TO TRANSLATE") or New LocalizedHtmlString("TEXT TO TRANSLATE") is also supported.
+/// The factory method call - LocalizedString.Create("TEXT TO TRANSLATE") or LocalizedHtmlString.Create("TEXT TO TRANSLATE")
+/// is also supported, including the LocalizedStringExtensions.Create("TEXT TO TRANSLATE") and
+/// LocalizedHtmlStringExtensions.Create("TEXT TO TRANSLATE") forms.
 /// </remarks>
 /// <remarks>
 /// Creates a new instance of a <see cref="LocalizedStringExtractor"/>.
@@ -20,12 +23,6 @@ namespace OrchardCoreContrib.PoExtractor.DotNet.VB;
 /// <param name="metadataProvider">The <see cref="IMetadataProvider{TNode}"/>.</param>
 public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProvider) : LocalizableStringExtractor<SyntaxNode>(metadataProvider)
 {
-    private static readonly string[] _localizedStringTypeNames =
-    [
-        "LocalizedString",
-        "LocalizedHtmlString"
-    ];
-
     /// <inheritdoc/>
     public override bool TryExtract(SyntaxNode node, out LocalizableStringOccurence result)
     {
@@ -33,11 +30,16 @@ public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProv
 
         result = null;
 
-        if (node is ObjectCreationExpressionSyntax creation &&
-            IsLocalizedStringType(creation.Type) &&
-            creation.ArgumentList != null &&
-            creation.ArgumentList.Arguments.Count > 0 &&
-            creation.ArgumentList.Arguments[0].GetExpression() is LiteralExpressionSyntax literal &&
+        var argumentList = node switch
+        {
+            ObjectCreationExpressionSyntax creation when IsTypeName(creation.Type, LocalizedStringTypes.TypeNames) => creation.ArgumentList,
+            InvocationExpressionSyntax invocation when IsFactoryMethod(invocation.Expression) => invocation.ArgumentList,
+            _ => null
+        };
+
+        if (argumentList != null &&
+            argumentList.Arguments.Count > 0 &&
+            argumentList.Arguments[0].GetExpression() is LiteralExpressionSyntax literal &&
             literal.IsKind(SyntaxKind.StringLiteralExpression))
         {
             result = CreateLocalizedString(literal.Token.ValueText, null, node);
@@ -48,14 +50,25 @@ public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProv
         return false;
     }
 
-    private static bool IsLocalizedStringType(TypeSyntax type) => type switch
+    private static bool IsFactoryMethod(ExpressionSyntax expression)
+        => expression is MemberAccessExpressionSyntax memberAccess &&
+            IsName(memberAccess.Name.Identifier.ValueText, LocalizedStringTypes.FactoryMethodName) &&
+            IsTypeName(memberAccess.Expression, LocalizedStringTypes.FactoryTypeNames);
+
+    private static bool IsTypeName(ExpressionSyntax expression, string[] typeNames)
     {
-        IdentifierNameSyntax identifierName => IsLocalizedStringTypeName(identifierName.Identifier.ValueText),
-        QualifiedNameSyntax qualifiedName => IsLocalizedStringTypeName(qualifiedName.Right.Identifier.ValueText),
-        _ => false
-    };
+        var name = expression switch
+        {
+            IdentifierNameSyntax identifierName => identifierName.Identifier.ValueText,
+            QualifiedNameSyntax qualifiedName => qualifiedName.Right.Identifier.ValueText,
+            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.ValueText,
+            _ => null
+        };
+
+        return name != null && typeNames.Any(typeName => IsName(name, typeName));
+    }
 
     // Visual Basic identifiers are case-insensitive.
-    private static bool IsLocalizedStringTypeName(string name)
-        => _localizedStringTypeNames.Contains(name, StringComparer.OrdinalIgnoreCase);
+    private static bool IsName(string name, string expected)
+        => string.Equals(name, expected, StringComparison.OrdinalIgnoreCase);
 }

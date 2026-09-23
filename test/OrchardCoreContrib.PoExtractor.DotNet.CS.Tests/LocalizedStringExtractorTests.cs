@@ -18,6 +18,13 @@ public class LocalizedStringExtractorTests
     [InlineData("""new LocalizedHtmlString("Thing", "Thing");""", "Thing")]
     [InlineData("""new LocalizedHtmlString("Thing {0}", "Thing {0}", false, 1);""", "Thing {0}")]
     [InlineData("""new Microsoft.AspNetCore.Mvc.Localization.LocalizedHtmlString("Thing", "Thing");""", "Thing")]
+    [InlineData("""LocalizedString.Create("Thing");""", "Thing")]
+    [InlineData("""LocalizedHtmlString.Create("Thing");""", "Thing")]
+    [InlineData("""LocalizedString.Create("my " + "text");""", "my text")]
+    [InlineData("""Microsoft.Extensions.Localization.LocalizedString.Create("Thing");""", "Thing")]
+    [InlineData("""global::Microsoft.AspNetCore.Mvc.Localization.LocalizedHtmlString.Create("Thing");""", "Thing")]
+    [InlineData("""LocalizedStringExtensions.Create("Thing");""", "Thing")]
+    [InlineData("""LocalizedHtmlStringExtensions.Create("Thing");""", "Thing")]
     [InlineData(
         """
         new LocalizedString(@"This is a multi-line
@@ -33,7 +40,7 @@ public class LocalizedStringExtractorTests
         var metadataProvider = new CSharpMetadataProvider("DummyBasePath");
         var extractor = new LocalizedStringExtractor(metadataProvider);
 
-        var node = GetObjectCreationNode(source);
+        var node = GetNode(source);
 
         // Act
         var extracted = extractor.TryExtract(node, out var result);
@@ -51,13 +58,19 @@ public class LocalizedStringExtractorTests
     [InlineData("""new LocalizedHtmlString();""")]
     [InlineData("""new LocalizedHtmlString(nameof(Thing), "Thing");""")]
     [InlineData("""new Thing("Thing", "Thing");""")]
+    [InlineData("""new LocalizedStringExtensions("Thing");""")]
+    [InlineData("""LocalizedString.Create(nameof(Thing));""")]
+    [InlineData("""LocalizedString.Create(name);""")]
+    [InlineData("""LocalizedString.Create();""")]
+    [InlineData("""LocalizedString.Parse("Thing");""")]
+    [InlineData("""Thing.Create("Thing");""")]
     public void ExtractString_NotLocalizedStringWithLiteralName_ReturnsFalse(string source)
     {
         // Arrange
         var metadataProvider = new CSharpMetadataProvider("DummyBasePath");
         var extractor = new LocalizedStringExtractor(metadataProvider);
 
-        var node = GetObjectCreationNode(source);
+        var node = GetNode(source);
 
         // Act
         var extracted = extractor.TryExtract(node, out var result);
@@ -67,10 +80,10 @@ public class LocalizedStringExtractorTests
         Assert.Null(result);
     }
 
-    private static ObjectCreationExpressionSyntax GetObjectCreationNode(string source)
+    private static ExpressionSyntax GetNode(string source)
         => CSharpSyntaxTree.ParseText(source, path: "DummyPath")
             .GetRoot()
             .DescendantNodes()
-            .OfType<ObjectCreationExpressionSyntax>()
-            .First();
+            .OfType<ExpressionSyntax>()
+            .First(node => node is ObjectCreationExpressionSyntax or InvocationExpressionSyntax);
 }
