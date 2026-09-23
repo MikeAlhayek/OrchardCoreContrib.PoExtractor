@@ -8,6 +8,8 @@ public class LocalizedStringExtractorTests
 {
     [Theory]
     [InlineData("""new LocalizedString("Thing", "Thing");""", "Thing")]
+    [InlineData("""new LocalizedString("Thing");""", "Thing")]
+    [InlineData("""new LocalizedHtmlString("Thing");""", "Thing")]
     [InlineData("""new LocalizedString("Thing", "Other thing");""", "Thing")]
     [InlineData("""new LocalizedString("Thing", "Thing", true);""", "Thing")]
     [InlineData("""new Microsoft.Extensions.Localization.LocalizedString("Thing", "Thing");""", "Thing")]
@@ -45,7 +47,8 @@ public class LocalizedStringExtractorTests
     [Theory]
     [InlineData("""new LocalizedString(nameof(Thing), "Thing");""")]
     [InlineData("""new LocalizedString(name, "Thing");""")]
-    [InlineData("""new LocalizedString("Thing");""")]
+    [InlineData("""new LocalizedString();""")]
+    [InlineData("""new LocalizedHtmlString();""")]
     [InlineData("""new LocalizedHtmlString(nameof(Thing), "Thing");""")]
     [InlineData("""new Thing("Thing", "Thing");""")]
     public void ExtractString_NotLocalizedStringWithLiteralName_ReturnsFalse(string source)

@@ -11,7 +11,8 @@ namespace OrchardCoreContrib.PoExtractor.DotNet.VB;
 /// </summary>
 /// <remarks>
 /// The localizable string is identified by the constructor call - New LocalizedString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE")
-/// or New LocalizedHtmlString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE")
+/// or New LocalizedHtmlString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE"). The single argument form
+/// New LocalizedString("TEXT TO TRANSLATE") or New LocalizedHtmlString("TEXT TO TRANSLATE") is also supported.
 /// </remarks>
 /// <remarks>
 /// Creates a new instance of a <see cref="LocalizedStringExtractor"/>.
@@ -35,7 +36,7 @@ public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProv
         if (node is ObjectCreationExpressionSyntax creation &&
             IsLocalizedStringType(creation.Type) &&
             creation.ArgumentList != null &&
-            creation.ArgumentList.Arguments.Count >= 2 &&
+            creation.ArgumentList.Arguments.Count > 0 &&
             creation.ArgumentList.Arguments[0].GetExpression() is LiteralExpressionSyntax literal &&
             literal.IsKind(SyntaxKind.StringLiteralExpression))
         {
