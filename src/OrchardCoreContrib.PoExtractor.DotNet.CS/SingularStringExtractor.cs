@@ -43,7 +43,7 @@ public class SingularStringExtractor(IMetadataProvider<SyntaxNode> metadataProvi
         return false;
     }
 
-    private static bool TryGetString(ExpressionSyntax expression, out string value)
+    internal static bool TryGetString(ExpressionSyntax expression, out string value)
     {
         if (expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression))
         {

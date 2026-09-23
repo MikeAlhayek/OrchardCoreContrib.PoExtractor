@@ -33,6 +33,7 @@ public class VisualBasicProjectProcessor : IProjectProcessor
         [
             new SingularStringExtractor(visualBasicMetadataProvider),
             new PluralStringExtractor(visualBasicMetadataProvider),
+            new LocalizedStringExtractor(visualBasicMetadataProvider),
             new ErrorMessageAnnotationStringExtractor(visualBasicMetadataProvider),
             new DisplayAttributeDescriptionStringExtractor(visualBasicMetadataProvider),
             new DisplayAttributeNameStringExtractor(visualBasicMetadataProvider),

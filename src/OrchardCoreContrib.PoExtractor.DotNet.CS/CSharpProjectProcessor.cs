@@ -33,6 +33,7 @@ public class CSharpProjectProcessor : IProjectProcessor
         [
             new SingularStringExtractor(csharpMetadataProvider),
             new PluralStringExtractor(csharpMetadataProvider),
+            new LocalizedStringExtractor(csharpMetadataProvider),
             new ErrorMessageAnnotationStringExtractor(csharpMetadataProvider),
             new DisplayAttributeDescriptionStringExtractor(csharpMetadataProvider),
             new DisplayAttributeNameStringExtractor(csharpMetadataProvider),
