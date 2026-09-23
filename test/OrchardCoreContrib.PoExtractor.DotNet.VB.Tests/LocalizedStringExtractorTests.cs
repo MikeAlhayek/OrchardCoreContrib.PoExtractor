@@ -11,6 +11,8 @@ public class LocalizedStringExtractorTests
     [InlineData("""New LocalizedString("Thing", "Other thing")""", "Thing")]
     [InlineData("""New localizedstring("Thing", "Thing")""", "Thing")]
     [InlineData("""New Microsoft.Extensions.Localization.LocalizedString("Thing", "Thing")""", "Thing")]
+    [InlineData("""New LocalizedHtmlString("Thing", "Thing")""", "Thing")]
+    [InlineData("""New Microsoft.AspNetCore.Mvc.Localization.LocalizedHtmlString("Thing", "Thing")""", "Thing")]
     public void ExtractString(string source, string expected)
     {
         // Arrange
@@ -32,6 +34,7 @@ public class LocalizedStringExtractorTests
     [InlineData("""New LocalizedString(NameOf(Thing), "Thing")""")]
     [InlineData("""New LocalizedString(name, "Thing")""")]
     [InlineData("""New LocalizedString("Thing")""")]
+    [InlineData("""New LocalizedHtmlString(NameOf(Thing), "Thing")""")]
     [InlineData("""New Thing("Thing", "Thing")""")]
     public void ExtractString_NotLocalizedStringWithLiteralName_ReturnsFalse(string source)
     {

@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using System;
+using System.Linq;
 
 namespace OrchardCoreContrib.PoExtractor.DotNet.VB;
 
@@ -10,6 +11,7 @@ namespace OrchardCoreContrib.PoExtractor.DotNet.VB;
 /// </summary>
 /// <remarks>
 /// The localizable string is identified by the constructor call - New LocalizedString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE")
+/// or New LocalizedHtmlString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE")
 /// </remarks>
 /// <remarks>
 /// Creates a new instance of a <see cref="LocalizedStringExtractor"/>.
@@ -17,7 +19,11 @@ namespace OrchardCoreContrib.PoExtractor.DotNet.VB;
 /// <param name="metadataProvider">The <see cref="IMetadataProvider{TNode}"/>.</param>
 public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProvider) : LocalizableStringExtractor<SyntaxNode>(metadataProvider)
 {
-    private const string LocalizedStringTypeName = "LocalizedString";
+    private static readonly string[] _localizedStringTypeNames =
+    [
+        "LocalizedString",
+        "LocalizedHtmlString"
+    ];
 
     /// <inheritdoc/>
     public override bool TryExtract(SyntaxNode node, out LocalizableStringOccurence result)
@@ -50,5 +56,5 @@ public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProv
 
     // Visual Basic identifiers are case-insensitive.
     private static bool IsLocalizedStringTypeName(string name)
-        => string.Equals(name, LocalizedStringTypeName, StringComparison.OrdinalIgnoreCase);
+        => _localizedStringTypeNames.Contains(name, StringComparer.OrdinalIgnoreCase);
 }

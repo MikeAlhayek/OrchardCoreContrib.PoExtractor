@@ -13,6 +13,9 @@ public class LocalizedStringExtractorTests
     [InlineData("""new Microsoft.Extensions.Localization.LocalizedString("Thing", "Thing");""", "Thing")]
     [InlineData("""new global::Microsoft.Extensions.Localization.LocalizedString("Thing", "Thing");""", "Thing")]
     [InlineData("""new LocalizedString("my " + "text", "my text");""", "my text")]
+    [InlineData("""new LocalizedHtmlString("Thing", "Thing");""", "Thing")]
+    [InlineData("""new LocalizedHtmlString("Thing {0}", "Thing {0}", false, 1);""", "Thing {0}")]
+    [InlineData("""new Microsoft.AspNetCore.Mvc.Localization.LocalizedHtmlString("Thing", "Thing");""", "Thing")]
     [InlineData(
         """
         new LocalizedString(@"This is a multi-line
@@ -43,7 +46,7 @@ public class LocalizedStringExtractorTests
     [InlineData("""new LocalizedString(nameof(Thing), "Thing");""")]
     [InlineData("""new LocalizedString(name, "Thing");""")]
     [InlineData("""new LocalizedString("Thing");""")]
-    [InlineData("""new LocalizedHtmlString("Thing", "Thing");""")]
+    [InlineData("""new LocalizedHtmlString(nameof(Thing), "Thing");""")]
     [InlineData("""new Thing("Thing", "Thing");""")]
     public void ExtractString_NotLocalizedStringWithLiteralName_ReturnsFalse(string source)
     {

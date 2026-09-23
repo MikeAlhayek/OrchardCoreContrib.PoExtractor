@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Linq;
 
 namespace OrchardCoreContrib.PoExtractor.DotNet.CS;
 
@@ -9,6 +10,7 @@ namespace OrchardCoreContrib.PoExtractor.DotNet.CS;
 /// </summary>
 /// <remarks>
 /// The localizable string is identified by the constructor call - new LocalizedString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE")
+/// or new LocalizedHtmlString("TEXT TO TRANSLATE", "TEXT TO TRANSLATE")
 /// </remarks>
 /// <remarks>
 /// Creates a new instance of a <see cref="LocalizedStringExtractor"/>.
@@ -16,7 +18,11 @@ namespace OrchardCoreContrib.PoExtractor.DotNet.CS;
 /// <param name="metadataProvider">The <see cref="IMetadataProvider{TNode}"/>.</param>
 public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProvider) : LocalizableStringExtractor<SyntaxNode>(metadataProvider)
 {
-    private const string LocalizedStringTypeName = "LocalizedString";
+    private static readonly string[] _localizedStringTypeNames =
+    [
+        "LocalizedString",
+        "LocalizedHtmlString"
+    ];
 
     /// <inheritdoc/>
     public override bool TryExtract(SyntaxNode node, out LocalizableStringOccurence result)
@@ -41,9 +47,9 @@ public class LocalizedStringExtractor(IMetadataProvider<SyntaxNode> metadataProv
 
     private static bool IsLocalizedStringType(TypeSyntax type) => type switch
     {
-        IdentifierNameSyntax identifierName => identifierName.Identifier.Text == LocalizedStringTypeName,
-        QualifiedNameSyntax qualifiedName => qualifiedName.Right.Identifier.Text == LocalizedStringTypeName,
-        AliasQualifiedNameSyntax aliasQualifiedName => aliasQualifiedName.Name.Identifier.Text == LocalizedStringTypeName,
+        IdentifierNameSyntax identifierName => _localizedStringTypeNames.Contains(identifierName.Identifier.Text),
+        QualifiedNameSyntax qualifiedName => _localizedStringTypeNames.Contains(qualifiedName.Right.Identifier.Text),
+        AliasQualifiedNameSyntax aliasQualifiedName => _localizedStringTypeNames.Contains(aliasQualifiedName.Name.Identifier.Text),
         _ => false
     };
 }
