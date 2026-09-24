@@ -74,7 +74,7 @@ OrchardCoreContrib.PoExtractor assumes, the code follows several conventions:
 * `IHtmlLocalizer` or a derived class is accessed via a field named `H` (This is a convention used in Orchard Core)
 * `IStringLocalizer` or `IHtmlLocalizer` is accessed via a field named `T` (This is a older convention used in Orchard Core)
 * `LocalizedString` or `LocalizedHtmlString` instances created directly with a string literal name, e.g., `new LocalizedString("Text", "Text")` or `new LocalizedHtmlString("Text", "Text")`, are extracted using the name as the message ID. The single-argument form, e.g., `new LocalizedString("Text")` or `new LocalizedHtmlString("Text")`, is also supported
-* `LocalizedString.Create("Text")` and `LocalizedHtmlString.Create("Text")` factory calls (and the `LocalizedStringExtensions.Create("Text")` and `LocalizedHtmlStringExtensions.Create("Text")` forms) are extracted using the argument as the message ID
+* `LocalizedString.Create("Text")` and `LocalizedHtmlString.Create("Text")` factory calls (and the `LocalizedStringExtensions.Create("Text")` and `LocalizedHtmlStringExtensions.Create("Text")` forms) are extracted using the first argument as the message ID. Any other arguments, such as format arguments, e.g., `LocalizedString.Create("Hello {0}", name)`, are ignored
 * Liquid templates use the filter named `t` (This is a convention used in Fluid)
 * context of the localizable string is the full name (with namespace) of the containing class for C# or VB code
 * context of the localizable string is the dot-delimited relative path the to view for Razor templates

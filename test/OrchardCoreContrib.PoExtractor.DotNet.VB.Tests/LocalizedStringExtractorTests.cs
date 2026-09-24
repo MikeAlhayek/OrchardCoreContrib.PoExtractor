@@ -21,6 +21,8 @@ public class LocalizedStringExtractorTests
     [InlineData("""Microsoft.Extensions.Localization.LocalizedString.Create("Thing")""", "Thing")]
     [InlineData("""LocalizedStringExtensions.Create("Thing")""", "Thing")]
     [InlineData("""LocalizedHtmlStringExtensions.Create("Thing")""", "Thing")]
+    [InlineData("""LocalizedStringExtensions.Create("Hello {0}", name)""", "Hello {0}")]
+    [InlineData("""LocalizedStringExtensions.Create("Manage things", GetType(Permissions))""", "Manage things")]
     public void ExtractString(string source, string expected)
     {
         // Arrange

@@ -25,6 +25,9 @@ public class LocalizedStringExtractorTests
     [InlineData("""global::Microsoft.AspNetCore.Mvc.Localization.LocalizedHtmlString.Create("Thing");""", "Thing")]
     [InlineData("""LocalizedStringExtensions.Create("Thing");""", "Thing")]
     [InlineData("""LocalizedHtmlStringExtensions.Create("Thing");""", "Thing")]
+    [InlineData("""LocalizedString.Create("Hello {0}", name);""", "Hello {0}")]
+    [InlineData("""LocalizedHtmlString.Create("<b>{0}</b> and {1}", first, second);""", "<b>{0}</b> and {1}")]
+    [InlineData("""LocalizedString.Create("Manage things", typeof(Permissions));""", "Manage things")]
     [InlineData(
         """
         new LocalizedString(@"This is a multi-line
